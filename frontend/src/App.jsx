@@ -1,4 +1,5 @@
 import React from 'react';
+import Workspace from './portals/workspace/Workspace';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -15,6 +16,8 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/preview/admin" element={<Workspace role="admin" preview />} />
+          <Route path="/preview/staff" element={<Workspace role="staff" preview />} />
           {/* Public Website */}
           <Route path="/" element={<LandingPage />} />
 
