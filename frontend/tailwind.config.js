@@ -8,42 +8,44 @@ export default {
     extend: {
       colors: {
         canvas: {
-          warm: "#EDECE7", // Base canvas warm grey / soft sand from screenshot
-          light: "#F5F4EF",
-          card: "#FFFFFF"
+          DEFAULT: "#E9E8E3", // Exact specified background
+          card: "#FFFFFF",    // Exact specified white card
+          light: "#F5F5F2",
         },
         sage: {
-          deep: "#3D5647", // Dark forest sage for featured card & primary CTAs
-          primary: "#486351",
-          mid: "#5C7C66",
-          accent: "#6E8B77",
-          light: "#E8F0EB", // Soft sage tint for positive +2.45% pills
-          border: "#D6E0D9"
+          primary: "#809387", // Exact specified primary sage green
+          dark: "#64786D",    // Exact specified dark sage green
+          light: "#F2F3F0",   // Exact specified light sage
+          muted: "#A0B1A7",
+          deep: "#4D5E54",
         },
-        charcoal: {
-          dark: "#1A201C",
-          DEFAULT: "#232825",
-          light: "#4E5450"
+        ink: {
+          DEFAULT: "#2D2E35", // Exact specified text color
+          muted: "#6B6E77",
+          subtle: "#8E919B",
         },
-        slate: {
-          muted: "#79807A",
-          subtle: "#9BA39D"
+        line: {
+          DEFAULT: "#E5E5E0", // Exact specified border
+          dark: "#D5D5CF",
         },
-        alert: {
-          rose: "#FCEAEA",
-          roseText: "#B84A4A",
-          gold: "#F6EEDA",
-          goldText: "#947833"
+        status: {
+          successBg: "#EBF3EE",
+          successText: "#4A7C59",
+          alertBg: "#FCEAEA",
+          alertText: "#B84A4A",
+          warningBg: "#FDF4E7",
+          warningText: "#A36B26",
         }
       },
       borderRadius: {
+        'card': '18px',
         '2xl': '16px',
-        '3xl': '24px',
-        '4xl': '32px'
+        '3xl': '20px',
+        'pill': '9999px',
       },
       boxShadow: {
-        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.04)',
-        'elevated': '0 10px 30px -4px rgba(0, 0, 0, 0.06)'
+        'soft': '0 2px 12px -2px rgba(45, 46, 53, 0.05)',
+        'elevated': '0 8px 24px -4px rgba(45, 46, 53, 0.08)',
       }
     },
   },
