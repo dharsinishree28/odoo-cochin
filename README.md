@@ -1,6 +1,6 @@
 # Brightloop Software - Subscription & Quotation Management System
 
-A subscription-based quotation and offers management web platform featuring **Admin**, **Staff**, and **Customer** portals, built for **Brightloop Software** adhering to the **Odoo Cochin Hackathon** specifications and visually styled after the reference sage green, warm grey, and white minimalist dashboard design.
+A subscription-based quotation and offers management web platform featuring **Admin**, **Staff**, and **Customer** portals, built for **Brightloop Software** adhering to the **Odoo Cochin Hackathon** specifications and visually styled after the reference sage green, warm grey, and white minimalist dashboard design
 
 ---
 
