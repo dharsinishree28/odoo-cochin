@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
-import { 
-  CreditCard, 
-  CheckCircle2, 
-  Pause, 
-  Play, 
-  RefreshCw, 
-  FileText, 
-  Printer, 
-  Check, 
+import {
+  CreditCard,
+  CheckCircle2,
+  Pause,
+  Play,
+  RefreshCw,
+  FileText,
+  Printer,
+  Check,
   X,
   ShieldCheck,
   Calendar,
@@ -393,7 +393,7 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
       {/* ========================================================================= */}
       {activeNav === 'dashboard' && (
         <div className="space-y-8">
-          
+
           {/* A. Welcome Banner */}
           <div className="bg-gradient-to-r from-[#2A3B31] via-[#3D5647] to-[#25352B] rounded-3xl p-6 sm:p-8 text-white shadow-elevated relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="relative z-10 max-w-xl">
@@ -407,7 +407,7 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
               <p className="text-xs sm:text-sm text-white/80 mt-2 font-medium leading-relaxed">
                 Manage your active cloud subscription, explore tier-eligible software offers, and review your quotations and payment history in one place.
               </p>
-              
+
               <div className="flex flex-wrap items-center gap-3 mt-5">
                 <button
                   onClick={() => onNavigate && onNavigate('plans')}
@@ -432,9 +432,8 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
               <p className="text-lg font-extrabold text-white mt-1">
                 {activeSub ? activeSub.plan_name : 'No Active Plan'}
               </p>
-              <span className={`inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full mt-2 ${
-                activeSub ? 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/30' : 'bg-amber-400/20 text-amber-200 border border-amber-400/30'
-              }`}>
+              <span className={`inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full mt-2 ${activeSub ? 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/30' : 'bg-amber-400/20 text-amber-200 border border-amber-400/30'
+                }`}>
                 {activeSub ? (activeSub.is_paused ? 'Paused' : 'Active Subscriber') : 'Guest Access'}
               </span>
             </div>
@@ -615,15 +614,15 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
                 const finalPrice = offer.originalPrice - discountAmt;
 
                 return (
-                  <div 
+                  <div
                     key={offer.id}
                     className="bg-canvas-card rounded-2xl border border-line shadow-soft overflow-hidden flex flex-col justify-between hover:shadow-elevated transition-all duration-200 group"
                   >
                     <div>
                       {/* Product Image */}
                       <div className="relative h-44 w-full overflow-hidden bg-slate-100">
-                        <img 
-                          src={offer.image} 
+                        <img
+                          src={offer.image}
                           alt={offer.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -659,7 +658,7 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
                         <div className="pt-1">
                           <span className="text-[10px] font-bold text-ink-muted block uppercase tracking-wider">Required Plan:</span>
                           <span className="text-xs font-semibold text-ink">{offer.requiredPlan}</span>
-                          
+
                           <div className="mt-2">
                             {isEligible ? (
                               <span className="inline-flex items-center gap-1 text-[11px] font-bold text-status-successText bg-status-successBg px-2 py-0.5 rounded-full border border-status-successText/20">
@@ -906,11 +905,10 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
               return (
                 <div
                   key={plan.id}
-                  className={`bg-canvas-card rounded-3xl p-6 sm:p-8 border shadow-soft flex flex-col justify-between relative transition-all duration-300 ${
-                    plan.isPopular 
-                      ? 'border-2 border-sage-dark shadow-elevated ring-1 ring-sage-dark/20' 
+                  className={`bg-canvas-card rounded-3xl p-6 sm:p-8 border shadow-soft flex flex-col justify-between relative transition-all duration-300 ${plan.isPopular
+                      ? 'border-2 border-sage-dark shadow-elevated ring-1 ring-sage-dark/20'
                       : 'border-line hover:border-line-dark'
-                  }`}
+                    }`}
                 >
                   {/* Popular Highlight Badge */}
                   {plan.isPopular && (
@@ -968,13 +966,12 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
                     <button
                       onClick={() => setConfirmPlanModal(plan)}
                       disabled={isCurrent}
-                      className={`w-full py-3 rounded-full text-xs sm:text-sm font-bold transition-all shadow-soft flex items-center justify-center gap-2 ${
-                        isCurrent
+                      className={`w-full py-3 rounded-full text-xs sm:text-sm font-bold transition-all shadow-soft flex items-center justify-center gap-2 ${isCurrent
                           ? 'bg-canvas text-ink-muted border border-line cursor-default'
                           : plan.isPopular
                             ? 'bg-sage-dark hover:bg-sage-deep text-white'
                             : 'bg-white hover:bg-sage-dark hover:text-white text-ink border border-line'
-                      }`}
+                        }`}
                     >
                       <span>{isCurrent ? 'Current Plan' : 'Select Plan'}</span>
                       {!isCurrent && <ArrowRight className="w-4 h-4" />}
@@ -1003,16 +1000,16 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
 
           {/* Main Offer Card */}
           <div className="bg-canvas-card rounded-3xl border border-line shadow-elevated overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-            
+
             {/* Left Col: Image & Badges */}
             <div className="lg:col-span-5 relative bg-slate-100 flex flex-col justify-between p-6 overflow-hidden min-h-[340px]">
-              <img 
-                src={currentOffer.image} 
-                alt={currentOffer.name} 
+              <img
+                src={currentOffer.image}
+                alt={currentOffer.name}
                 className="absolute inset-0 w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              
+
               <div className="relative z-10 flex items-center justify-between">
                 <span className="bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold">
                   {currentOffer.category}
@@ -1070,7 +1067,7 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
                         <span className="text-[10px] font-bold text-ink-muted uppercase tracking-wider block">
                           Dynamic Pricing Breakdown
                         </span>
-                        
+
                         <div className="flex justify-between text-xs text-ink">
                           <span>Original Price:</span>
                           <span className="font-semibold">${currentOffer.originalPrice.toFixed(2)}</span>
@@ -1209,11 +1206,10 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
                       <td className="py-4 text-ink-muted">{q.valid_days || 30} Days</td>
                       <td className="py-4 font-black text-ink">${q.total_amount?.toFixed(2)}</td>
                       <td className="py-4">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                          q.status === 'Accepted'
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${q.status === 'Accepted'
                             ? 'bg-status-successBg text-status-successText border border-status-successText/20'
                             : 'bg-amber-50 text-amber-800 border border-amber-200'
-                        }`}>
+                          }`}>
                           {q.status === 'Accepted' ? 'Accepted & Active' : 'Pending Review'}
                         </span>
                       </td>
@@ -1293,11 +1289,10 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
                       <td className="py-4 text-ink-muted">{inv.due_date}</td>
                       <td className="py-4 font-black text-ink">${inv.total_amount?.toFixed(2)}</td>
                       <td className="py-4">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                          inv.status === 'Paid'
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${inv.status === 'Paid'
                             ? 'bg-status-successBg text-status-successText border border-status-successText/20'
                             : 'bg-amber-50 text-amber-800 border border-amber-200'
-                        }`}>
+                          }`}>
                           {inv.status}
                         </span>
                       </td>
@@ -1482,7 +1477,7 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
                 <span className="text-[10px] font-bold text-sage-dark uppercase tracking-wider block">Confirm Plan Selection</span>
                 <h3 className="text-xl font-black text-ink">{confirmPlanModal.name}</h3>
               </div>
-              <button 
+              <button
                 onClick={() => setConfirmPlanModal(null)}
                 className="w-8 h-8 rounded-full bg-canvas text-ink-subtle hover:text-ink flex items-center justify-center"
               >
@@ -1598,7 +1593,7 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
                 <Receipt className="w-5 h-5 text-sage-dark" />
                 <h3 className="text-lg font-black text-ink">Payment Receipt</h3>
               </div>
-              <button 
+              <button
                 onClick={() => setSelectedReceipt(null)}
                 className="w-7 h-7 rounded-full bg-canvas text-ink-subtle hover:text-ink flex items-center justify-center"
               >
@@ -1667,7 +1662,7 @@ export default function CustomerPortal({ activeNav = 'dashboard', offerId = null
           <div className="bg-canvas-card rounded-3xl p-6 sm:p-8 max-w-md w-full border border-line shadow-elevated space-y-4 animate-scale-in">
             <div className="flex items-center justify-between pb-3 border-b border-line">
               <h3 className="text-lg font-black text-ink">Settle Invoice</h3>
-              <button 
+              <button
                 onClick={() => setCheckoutInvoice(null)}
                 className="w-7 h-7 rounded-full bg-canvas text-ink-subtle hover:text-ink flex items-center justify-center"
               >
