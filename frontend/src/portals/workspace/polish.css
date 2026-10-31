@@ -1,0 +1,396 @@
+/* Professional UI pass. Isolated so the earlier visual treatment is easy to restore. */
+.bl-workspace .workspace-header {
+  padding: 23px 32px;
+}
+.bl-workspace h1 {
+  font-size: 26px;
+  font-weight: 650;
+}
+.bl-workspace .workspace-body {
+  gap: 22px;
+  padding: 26px 32px;
+}
+.bl-workspace .eyebrow {
+  font-size: 11px;
+  letter-spacing: 1.1px;
+}
+.bl-workspace .brand {
+  padding-bottom: 20px;
+}
+.bl-workspace .sidebar {
+  padding-top: 25px;
+}
+.bl-workspace .sidebar nav button {
+  font-size: 13px;
+  padding: 9px 12px;
+  min-height: 39px;
+  margin-bottom: 2px;
+}
+.bl-workspace .sidebar nav button:nth-child(6) {
+  margin-top: 0;
+}
+.bl-workspace .nav-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #7a877d;
+  padding: 19px 12px 8px;
+  letter-spacing: 0.25px;
+}
+.bl-workspace .nav-group-label:first-child {
+  padding-top: 3px;
+}
+.bl-workspace .account {
+  padding-top: 15px;
+  margin-top: 15px;
+}
+.bl-workspace .account b {
+  font-size: 12px;
+}
+.bl-workspace .account small {
+  font-size: 11px;
+}
+.bl-workspace .page-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.bl-workspace .page-intro p {
+  font-size: 14px;
+  color: #52675a;
+  margin: 0 0 5px;
+  line-height: 1.6;
+}
+.bl-workspace .page-record-count {
+  font-size: 12px;
+  color: #7b8a80;
+}
+.bl-workspace .page-primary-action {
+  flex-shrink: 0;
+}
+.bl-workspace .page-primary-action button {
+  padding: 10px 15px;
+  font-size: 13px;
+  min-height: 40px;
+}
+.bl-workspace .toolbar {
+  padding: 15px 20px;
+  gap: 12px;
+}
+.bl-workspace .toolbar input,
+.bl-workspace .toolbar select {
+  font-size: 13px;
+}
+.bl-workspace .toolbar select {
+  min-height: 37px;
+}
+.bl-workspace .toolbar .search input {
+  width: 285px;
+}
+.bl-workspace .panel table {
+  font-size: 13px;
+}
+.bl-workspace .panel th {
+  font-size: 12px;
+  font-weight: 550;
+  text-transform: none;
+  letter-spacing: 0;
+  padding: 14px 20px;
+  color: #617366;
+}
+.bl-workspace .panel td {
+  font-size: 13px;
+  padding: 18px 20px;
+  line-height: 1.5;
+}
+.bl-workspace .panel td.cell-name {
+  font-weight: 600;
+  color: #253d30;
+}
+.bl-workspace .panel td.cell-reference {
+  font-size: 12px;
+  font-weight: 400;
+  color: #7a897f;
+}
+.bl-workspace .panel .cell-number {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.bl-workspace .panel .cell-actions {
+  text-align: right;
+}
+.bl-workspace .cell-actions .row-actions {
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+}
+.bl-workspace .cell-actions button {
+  font-size: 12px;
+  padding: 6px 10px;
+  min-height: 32px;
+  color: #456752;
+}
+.bl-workspace .cell-actions button:hover {
+  background: #e9f1e9;
+  border-color: #becfbd;
+}
+.bl-workspace .panel tbody tr {
+  transition: background-color 0.14s ease;
+}
+.bl-workspace .panel tbody tr:hover {
+  background: #f4f8f3;
+}
+.bl-workspace .badge {
+  font-size: 11px;
+  font-weight: 550;
+  padding: 4px 9px;
+}
+.bl-workspace .pagination {
+  font-size: 12px;
+  padding: 14px 20px;
+}
+.bl-workspace .pagination button {
+  font-size: 12px;
+  padding: 5px 10px;
+}
+.bl-workspace .panel-heading {
+  padding: 20px;
+}
+.bl-workspace .panel-heading h2 {
+  font-size: 17px;
+}
+.bl-workspace .panel-heading p {
+  font-size: 13px;
+}
+.bl-workspace .panel-heading button {
+  font-size: 12px;
+}
+.bl-workspace .section-intro p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.bl-workspace .metric > span {
+  font-size: 13px;
+}
+.bl-workspace .metric > small {
+  font-size: 12px;
+}
+.bl-workspace .attention button {
+  font-size: 13px;
+}
+.bl-workspace .attention p {
+  font-size: 13px;
+}
+.bl-workspace .notice {
+  font-size: 13px;
+}
+.bl-workspace .workspace-dialog {
+  width: min(700px, calc(100vw - 32px));
+  max-height: 88dvh;
+  scroll-padding-bottom: 85px;
+}
+.bl-workspace .dialog-heading {
+  position: sticky;
+  top: -26px;
+  z-index: 2;
+  background: #e6eee6;
+}
+.bl-workspace .dialog-heading h2 {
+  font-size: 22px;
+}
+.bl-workspace .form-section {
+  border: 0;
+  border-bottom: 1px solid #e7ece5;
+  padding: 0 0 23px;
+  margin: 0 0 23px;
+  min-width: 0;
+}
+.bl-workspace .form-section:last-of-type {
+  border-bottom: 0;
+  margin-bottom: 8px;
+}
+.bl-workspace .form-section legend {
+  font-size: 14px;
+  font-weight: 600;
+  color: #314c3b;
+  padding: 0 0 15px;
+}
+.bl-workspace .form-grid {
+  gap: 18px;
+}
+.bl-workspace .workspace-dialog label {
+  font-size: 13px;
+  gap: 7px;
+  color: #5a6b5f;
+}
+.bl-workspace .workspace-dialog input,
+.bl-workspace .workspace-dialog select,
+.bl-workspace .workspace-dialog textarea {
+  font-size: 14px;
+  padding: 10px 12px;
+  min-height: 41px;
+}
+.bl-workspace .workspace-dialog input[type="checkbox"] {
+  min-height: auto;
+  width: 16px;
+  height: 16px;
+  accent-color: #345c50;
+}
+.bl-workspace .check {
+  align-items: flex-start;
+  line-height: 1.5;
+}
+.bl-workspace .check input {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.bl-workspace .workspace-dialog .dialog-actions {
+  position: sticky;
+  bottom: -26px;
+  z-index: 2;
+  background: #fff;
+  margin: 22px -26px -26px;
+  padding: 17px 26px;
+  box-shadow: 0 -5px 15px #2e4a3305;
+}
+.bl-workspace .dialog-actions button {
+  min-height: 40px;
+  font-size: 13px;
+  padding: 9px 17px;
+}
+.bl-workspace .record-summary p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+.bl-workspace .profile p {
+  font-size: 14px;
+}
+.bl-workspace .a-panel-title p,
+.bl-workspace .a-title p {
+  font-size: 13px;
+}
+.bl-workspace .a-panel h3 {
+  font-size: 16px;
+}
+.bl-workspace .a-kpi > small {
+  font-size: 11px;
+}
+.bl-workspace .a-kpi > div {
+  font-size: 13px;
+}
+.bl-workspace .a-table-scroll td {
+  font-size: 13px;
+}
+.bl-workspace .a-table-scroll th {
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.bl-workspace .a-chart-readout {
+  font-size: 11px;
+}
+.bl-workspace .a-mix-legend > div,
+.bl-workspace .a-methods > div > div:first-child {
+  font-size: 12px;
+}
+@media (max-width: 1100px) {
+  .bl-workspace .workspace-body {
+    padding: 24px;
+  }
+}
+@media (max-width: 700px) {
+  .bl-workspace .workspace-body {
+    padding: 18px;
+    gap: 18px;
+  }
+  .bl-workspace .workspace-header {
+    padding: 20px;
+  }
+  .bl-workspace .sidebar {
+    padding: 15px;
+  }
+  .bl-workspace .brand {
+    padding-bottom: 12px;
+  }
+  .bl-workspace .nav-group-label {
+    display: none;
+  }
+  .bl-workspace .sidebar nav button {
+    margin: 0;
+    padding: 10px 12px;
+  }
+  .bl-workspace .page-intro {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 13px;
+  }
+  .bl-workspace .page-primary-action:empty {
+    display: none;
+  }
+  .bl-workspace .toolbar .search input {
+    width: 100%;
+  }
+  .bl-workspace .cell-actions .row-actions {
+    flex-wrap: wrap;
+    min-width: 110px;
+  }
+  .bl-workspace .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .bl-workspace .metric > small {
+    font-size: 11px;
+  }
+  .bl-workspace .a-kpi > div {
+    font-size: 11px;
+  }
+  .bl-workspace .a-chart-readout {
+    font-size: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bl-workspace .panel tbody tr,
+  .bl-workspace button {
+    transition: none;
+  }
+}
+.bl-workspace .portal-switcher {
+  border-top: 1px solid #e2e8df;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+.bl-workspace .portal-switcher > span {
+  display: block;
+  font-size: 11px;
+  color: #718371;
+  margin-bottom: 7px;
+}
+.bl-workspace .portal-switcher > div {
+  display: flex;
+  gap: 4px;
+}
+.bl-workspace .portal-switcher button {
+  text-transform: capitalize;
+  flex: 1;
+  font-size: 11px;
+  padding: 6px 4px;
+}
+.bl-workspace .portal-switcher button[aria-pressed="true"] {
+  background: #345c50;
+  color: white;
+  opacity: 1;
+}
+.bl-workspace .portal-switcher small {
+  font-size: 10px;
+  color: #879484;
+  display: block;
+  margin-top: 6px;
+}
+.bl-workspace[aria-busy="true"] .workspace-body button,
+.bl-workspace .workspace-dialog.is-saving button {
+  pointer-events: none;
+  opacity: 0.6;
+}
+@media (max-width: 700px) {
+  .bl-workspace .portal-switcher {
+    display: none;
+  }
+}
