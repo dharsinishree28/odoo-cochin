@@ -5,10 +5,12 @@ import re
 class UserLogin(BaseModel):
     email: str
     password: str
+    portal: Optional[str] = None
 
 class UserRegister(BaseModel):
     email: str
     password: str
+    portal: Optional[str] = None
     full_name: str
     role: str = "customer" # admin, staff, customer
     company_name: Optional[str] = None
@@ -101,3 +103,23 @@ class DiscountRuleCreate(BaseModel):
     usage_limit: int = 100
     target_type: str = "whole_subscription"
     target_product_id: Optional[int] = None
+
+
+class CustomerSubscribeRequest(BaseModel):
+    customer_id: int
+    plan_id: int
+
+class CustomerQuoteRequest(BaseModel):
+    customer_id: int
+    product_id: int
+    variant_id: Optional[int] = None
+    offer_id: Optional[int] = None
+    offer_title: Optional[str] = None
+    original_price: float
+    discount_pct: float = 0.0
+    discount_amount: float = 0.0
+    unit_price: float
+    tax_rate: float = 18.0
+    tax_amount: float
+    total_amount: float
+    notes: Optional[str] = None

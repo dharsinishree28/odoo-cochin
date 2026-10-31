@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/public/LandingPage';
 import LoginPage from './pages/auth/LoginPage';
@@ -10,18 +10,40 @@ import AdminPortalWrapper from './portals/AdminPortalWrapper';
 import StaffPortalWrapper from './portals/StaffPortalWrapper';
 import CustomerPortalWrapper from './portals/CustomerPortalWrapper';
 
+function RootRedirect() {
+  const { user, initializing } = useAuth();
+
+  if (initializing) {
+    return (
+      <div className="min-h-screen bg-canvas flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-10 h-10 border-3 border-sage-dark border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-xs font-bold text-ink-muted">Loading workspace...</p>
+      </div>
+    );
+  }
+
+  if (user && user.role) {
+    return <Navigate to={`/${user.role}/dashboard`} replace />;
+  }
+
+  return <Navigate to="/login" replace />;
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public Website */}
-          <Route path="/" element={<LandingPage />} />
+          {/* Default Entry Point: Redirects to /login (or dashboard if already authenticated) */}
+          <Route path="/" element={<RootRedirect />} />
 
           {/* Authentication Pages */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+          {/* Optional Landing Page view preserved */}
+          <Route path="/landing" element={<LandingPage />} />
 
           {/* Role-Protected Portals */}
           <Route

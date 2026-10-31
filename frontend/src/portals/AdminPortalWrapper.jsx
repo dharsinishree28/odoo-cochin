@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import PortalLayout from '../components/PortalLayout';
 import AdminPortal from './AdminPortal';
 import { 
@@ -16,7 +17,28 @@ import {
 } from 'lucide-react';
 
 export default function AdminPortalWrapper() {
-  const [activeNav, setActiveNav] = useState('dashboard');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Extract section from URL (e.g. /admin/dashboard or /admin/products)
+  const pathParts = location.pathname.split('/').filter(Boolean);
+  const currentSection = pathParts[1] || 'dashboard';
+
+  const [activeNav, setActiveNav] = useState(currentSection);
+
+  useEffect(() => {
+    const section = location.pathname.split('/').filter(Boolean)[1];
+    if (section) {
+      setActiveNav(section);
+    } else {
+      navigate('/admin/dashboard', { replace: true });
+    }
+  }, [location.pathname, navigate]);
+
+  function handleNavChange(newNav) {
+    setActiveNav(newNav);
+    navigate(`/admin/${newNav}`);
+  }
 
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
@@ -38,7 +60,7 @@ export default function AdminPortalWrapper() {
       subtitle="Executive management of products, plans, offers, staff, and financial reports"
       sidebarItems={sidebarItems}
       activeNav={activeNav}
-      setActiveNav={setActiveNav}
+      setActiveNav={handleNavChange}
     >
       <AdminPortal activeNav={activeNav} />
     </PortalLayout>

@@ -119,3 +119,82 @@ def renew_subscription(sub_id: int):
         new_exp = current_exp + timedelta(days=days)
         cursor.execute("UPDATE subscriptions SET expiry_date = ?, status = 'Active' WHERE id = ?", (str(new_exp), sub_id))
         return {"message": f"Subscription renewed until {new_exp}", "new_expiry_date": str(new_exp)}
+
+import random
+from app.schemas import CustomerSubscribeRequest
+
+@router.post("/subscribe")
+def customer_subscribe(req: CustomerSubscribeRequest):
+    today = datetime.now().date()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM plans WHERE id = ?", (req.plan_id,))
+        plan = cursor.fetchone()
+        if not plan:
+            raise HTTPException(status_code=404, detail="Plan not found")
+        plan_dict = dict(plan)
+        
+        # Verify customer exists
+        cursor.execute("SELECT id, full_name, email FROM users WHERE id = ?", (req.customer_id,))
+        cust = cursor.fetchone()
+        if not cust:
+            raise HTTPException(status_code=404, detail="Customer not found")
+        
+        # Close previous active subscriptions for this customer
+        cursor.execute("UPDATE subscriptions SET status = 'Closed' WHERE customer_id = ? AND status = 'Active'", (req.customer_id,))
+        
+        # Determine duration
+        freq = plan_dict.get("billing_frequency", "monthly")
+        days = 365 if freq == "yearly" else (7 if freq == "weekly" else 30)
+        expiry = today + timedelta(days=days)
+        sub_number = f"SUB-2026-{random.randint(1000, 9999)}"
+        
+        cost = float(plan_dict["cost"])
+        tax_amount = round(cost * 0.18, 2)
+        total_amount = round(cost + tax_amount, 2)
+        
+        cursor.execute("""
+            INSERT INTO subscriptions (
+                subscription_number, customer_id, plan_id, status, start_date, expiry_date,
+                payment_terms, subtotal, discount_amount, tax_amount, total_amount, billing_cycle, is_paused
+            ) VALUES (?, ?, ?, 'Active', ?, ?, 'Immediate', ?, 0.0, ?, ?, ?, 0)
+        """, (
+            sub_number, req.customer_id, req.plan_id, str(today), str(expiry),
+            cost, tax_amount, total_amount, freq
+        ))
+        sub_id = cursor.lastrowid
+        
+        # Add subscription line
+        prod_id = plan_dict.get("product_id") or 1
+        cursor.execute("""
+            INSERT INTO subscription_lines (subscription_id, product_id, variant_id, quantity, unit_price, tax_rate, line_total)
+            VALUES (?, ?, NULL, 1, ?, 18.0, ?)
+        """, (sub_id, prod_id, cost, cost))
+        
+        # Generate confirmed paid invoice & payment record for purchase history & receipts
+        inv_number = f"INV-2026-{random.randint(1000, 9999)}"
+        cursor.execute("""
+            INSERT INTO invoices (
+                invoice_number, subscription_id, customer_id, issue_date, due_date,
+                status, subtotal, tax_amount, discount_amount, total_amount, paid_amount, notes
+            ) VALUES (?, ?, ?, ?, ?, 'Paid', ?, ?, 0.0, ?, ?, ?)
+        """, (
+            inv_number, sub_id, req.customer_id, str(today), str(today),
+            cost, tax_amount, total_amount, total_amount, f"Plan subscription: {plan_dict['name']}"
+        ))
+        inv_id = cursor.lastrowid
+        
+        txn_ref = f"TXN-PLAN-{random.randint(100000, 999999)}"
+        cursor.execute("""
+            INSERT INTO payments (invoice_id, amount, method, payment_date, note, transaction_ref)
+            VALUES (?, ?, 'Credit Card', ?, ?, ?)
+        """, (inv_id, total_amount, str(today), f"Activated {plan_dict['name']}", txn_ref))
+        
+        return {
+            "message": f"Successfully activated {plan_dict['name']}!",
+            "subscription_id": sub_id,
+            "subscription_number": sub_number,
+            "plan_name": plan_dict["name"],
+            "invoice_number": inv_number,
+            "transaction_ref": txn_ref
+        }

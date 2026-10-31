@@ -240,6 +240,17 @@ def init_db():
         );
         """)
 
+        # 16. User Sessions table
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS user_sessions (
+            token TEXT PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            role TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            expires_at TIMESTAMP NOT NULL
+        );
+        """)
+
         # 15. Password Resets table
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS password_resets (

@@ -1,7 +1,7 @@
 const API_BASE = '/api/v1';
 
 async function request(endpoint, options = {}) {
-  const token = localStorage.getItem('brightloop_token');
+  const token = localStorage.getItem('brightloop_token') || sessionStorage.getItem('brightloop_token');
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
@@ -15,7 +15,10 @@ async function request(endpoint, options = {}) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `Request failed with status ${response.status}`);
+    const message = errorData.detail || `Request failed with status ${response.status}`;
+    const err = new Error(typeof message === 'string' ? message : JSON.stringify(message));
+    err.status = response.status;
+    throw err;
   }
 
   return response.json();
@@ -24,6 +27,8 @@ async function request(endpoint, options = {}) {
 export const api = {
   // Auth
   login: (creds) => request('/auth/login', { method: 'POST', body: JSON.stringify(creds) }),
+  logout: () => request('/auth/logout', { method: 'POST' }).catch(() => ({})),
+  getMe: () => request('/auth/me'),
   register: (data) => request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   forgotPassword: (email) => request('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
   getUsers: (role) => request(`/auth/users${role ? `?role=${role}` : ''}`),
@@ -44,6 +49,7 @@ export const api = {
   createQuotation: (data) => request('/quotations', { method: 'POST', body: JSON.stringify(data) }),
   updateQuoteStatus: (quoteId, status) => request(`/quotations/${quoteId}/status?status=${status}`, { method: 'PATCH' }),
   convertToSubscription: (quoteId) => request(`/quotations/${quoteId}/convert-to-subscription`, { method: 'POST' }),
+  requestCustomerQuote: (data) => request('/quotations/request', { method: 'POST', body: JSON.stringify(data) }),
 
   // Subscriptions
   getSubscriptions: (params = {}) => {
@@ -51,6 +57,7 @@ export const api = {
     return request(`/subscriptions${query ? `?${query}` : ''}`);
   },
   getSubscription: (subId) => request(`/subscriptions/${subId}`),
+  subscribePlan: (data) => request('/subscriptions/subscribe', { method: 'POST', body: JSON.stringify(data) }),
   updateSubStatus: (subId, status, is_paused = null) => request(`/subscriptions/${subId}/status`, {
     method: 'PATCH',
     body: JSON.stringify({ status, is_paused }),

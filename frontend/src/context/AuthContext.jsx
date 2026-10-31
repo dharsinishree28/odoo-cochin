@@ -5,27 +5,72 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('brightloop_user');
+    const saved = localStorage.getItem('brightloop_user') || sessionStorage.getItem('brightloop_user');
     return saved ? JSON.parse(saved) : null;
   });
-  const [token, setToken] = useState(() => localStorage.getItem('brightloop_token'));
+  const [token, setToken] = useState(() => {
+    return localStorage.getItem('brightloop_token') || sessionStorage.getItem('brightloop_token');
+  });
   const [loading, setLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
 
+  // Validate session against server on startup / refresh
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('brightloop_user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('brightloop_user');
+    let isMounted = true;
+    async function verifySession() {
+      const activeToken = localStorage.getItem('brightloop_token') || sessionStorage.getItem('brightloop_token');
+      if (activeToken) {
+        try {
+          const res = await api.getMe();
+          if (isMounted && res.user) {
+            setUser(res.user);
+            setToken(activeToken);
+            // Sync storage with authoritative server user data
+            if (localStorage.getItem('brightloop_token')) {
+              localStorage.setItem('brightloop_user', JSON.stringify(res.user));
+            } else {
+              sessionStorage.setItem('brightloop_user', JSON.stringify(res.user));
+            }
+          }
+        } catch (err) {
+          console.warn('Session verification failed, logging out:', err.message);
+          if (isMounted) {
+            handleLogoutLocally();
+          }
+        }
+      } else {
+        if (isMounted) {
+          setUser(null);
+          setToken(null);
+        }
+      }
+      if (isMounted) {
+        setInitializing(false);
+      }
     }
-  }, [user]);
 
-  async function login(email, password, rememberMe = true) {
+    verifySession();
+    return () => { isMounted = false; };
+  }, []);
+
+  function handleLogoutLocally() {
+    localStorage.removeItem('brightloop_token');
+    localStorage.removeItem('brightloop_user');
+    sessionStorage.removeItem('brightloop_token');
+    sessionStorage.removeItem('brightloop_user');
+    setToken(null);
+    setUser(null);
+  }
+
+  async function login(email, password, portal, rememberMe = true) {
     setLoading(true);
     try {
-      const res = await api.login({ email, password });
+      const res = await api.login({ email, password, portal });
+      handleLogoutLocally();
+
       const storage = rememberMe ? localStorage : sessionStorage;
       storage.setItem('brightloop_token', res.token);
-      localStorage.setItem('brightloop_user', JSON.stringify(res.user));
+      storage.setItem('brightloop_user', JSON.stringify(res.user));
       setToken(res.token);
       setUser(res.user);
       return res.user;
@@ -37,12 +82,12 @@ export function AuthProvider({ children }) {
   async function register(data) {
     setLoading(true);
     try {
-      // Public registration is strictly customer role
       const payload = {
         ...data,
         role: 'customer'
       };
       const res = await api.register(payload);
+      handleLogoutLocally();
       localStorage.setItem('brightloop_token', res.token);
       localStorage.setItem('brightloop_user', JSON.stringify(res.user));
       setToken(res.token);
@@ -53,29 +98,17 @@ export function AuthProvider({ children }) {
     }
   }
 
-  function logout() {
-    localStorage.removeItem('brightloop_token');
-    localStorage.removeItem('brightloop_user');
-    sessionStorage.removeItem('brightloop_token');
-    setToken(null);
-    setUser(null);
-  }
-
-  // Quick switch for reviewer convenience
-  async function quickSwitch(role) {
-    const creds = {
-      admin: { email: 'carlic@gmail.com', pw: 'Password@123' },
-      staff: { email: 'sarah.sales@brightloop.com', pw: 'Staff@1234' },
-      customer: { email: 'anna.jones@acmecorp.com', pw: 'Customer@123' }
-    }[role];
-
-    if (creds) {
-      return await login(creds.email, creds.pw, true);
+  async function logout() {
+    try {
+      await api.logout();
+    } catch (e) {
+      // Ignore network errors on logout
     }
+    handleLogoutLocally();
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, quickSwitch }}>
+    <AuthContext.Provider value={{ user, token, loading, initializing, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

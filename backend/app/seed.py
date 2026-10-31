@@ -2,16 +2,41 @@ import hashlib
 from datetime import datetime, timedelta
 from app.database import get_db
 
-def hash_pw(pw: str) -> str:
-    return hashlib.sha256(pw.encode()).hexdigest()
+SALT = "odoo_cochin_brightloop_2026_salt"
+
+def hash_pw(pw: str, salt: str = SALT) -> str:
+    return hashlib.sha256(f"{salt}:{pw}".encode("utf-8")).hexdigest()
+
+def ensure_demo_accounts(cursor):
+    """Seed the required demo testing accounts with salted passwords."""
+    demo_accounts = [
+        ("admin@odoocochin.com", hash_pw("Admin@123"), "Odoo Admin", "admin", "+91 98400 11001", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150", "Odoo Cochin Ltd"),
+        ("staff@odoocochin.com", hash_pw("Staff@123"), "Odoo Staff", "staff", "+91 98400 22002", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150", "Odoo Cochin Staff Ops"),
+        ("customer@odoocochin.com", hash_pw("Customer@123"), "Odoo Customer", "customer", "+91 98400 33003", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150", "Cochin Enterprises")
+    ]
+    for email, pw_hash, name, role, phone, avatar, company in demo_accounts:
+        cursor.execute("SELECT id FROM users WHERE LOWER(email) = ?", (email.lower(),))
+        existing = cursor.fetchone()
+        if existing:
+            cursor.execute("UPDATE users SET password_hash = ?, full_name = ?, role = ?, phone = ?, avatar_url = ?, company_name = ? WHERE id = ?", (pw_hash, name, role, phone, avatar, company, existing[0]))
+        else:
+            cursor.execute("INSERT INTO users (email, password_hash, full_name, role, phone, avatar_url, company_name) VALUES (?, ?, ?, ?, ?, ?, ?)", (email.lower(), pw_hash, name, role, phone, avatar, company))
+
+    # Standardize 3 tiers
+    cursor.execute("UPDATE plans SET name = 'Pro Plan', cost = 1200.0, billing_frequency = 'monthly' WHERE id = 1")
+    cursor.execute("UPDATE plans SET name = 'Premium Plan', cost = 12500.0, billing_frequency = 'yearly' WHERE id = 2")
+    cursor.execute("UPDATE plans SET name = 'Basic Plan', cost = 350.0, billing_frequency = 'monthly' WHERE id = 3")
 
 def seed_database():
     with get_db() as conn:
         cursor = conn.cursor()
         
+        # Always verify demo accounts exist
+        ensure_demo_accounts(cursor)
+
         # Check if users already seeded
         cursor.execute("SELECT COUNT(*) FROM users")
-        if cursor.fetchone()[0] > 0:
+        if cursor.fetchone()[0] > 3:
             return
 
         print("Seeding Brightloop Software database...")
@@ -36,7 +61,6 @@ def seed_database():
         cursor.execute("INSERT INTO tax_rules (name, rate, country, is_default) VALUES ('Reduced Tech Tax', 5.0, 'India', 0)")
 
         # 3. Seed Products
-        # As in Scene 2: Brightloop sells business software, add-ons, and products with variants like Odoo brand adds 560
         products = [
             ("Brightloop Enterprise ERP", "service", 1200.0, 400.0, "Core recurring business management software suite", "Brightloop"),
             ("CRM & Lead Automation", "service", 600.0, 150.0, "Pipelines, automated follow-ups, and email tracking", "Brightloop"),
@@ -46,14 +70,14 @@ def seed_database():
         for p in products:
             cursor.execute("INSERT INTO products (name, type, sales_price, cost_price, notes, brand) VALUES (?, ?, ?, ?, ?, ?)", p)
 
-        # 4. Seed Product Variants (Odoo Brand variant adds 560.0 to price as per Scene 2)
+        # 4. Seed Product Variants
         cursor.execute("INSERT INTO product_variants (product_id, variant_name, price_extra) VALUES (1, 'Standard Cloud Edition', 0.0)")
         cursor.execute("INSERT INTO product_variants (product_id, variant_name, price_extra) VALUES (1, 'Odoo Brand Integrated Edition', 560.0)")
         cursor.execute("INSERT INTO product_variants (product_id, variant_name, price_extra) VALUES (1, 'Custom On-Premises Edition', 900.0)")
         cursor.execute("INSERT INTO product_variants (product_id, variant_name, price_extra) VALUES (2, 'Standard Edition', 0.0)")
         cursor.execute("INSERT INTO product_variants (product_id, variant_name, price_extra) VALUES (2, 'Odoo Sync Connector', 250.0)")
 
-        # 5. Seed Plans (daily, weekly, monthly, yearly frequencies with auto_close, pause, renew toggles)
+        # 5. Seed Plans
         today = datetime.now().date()
         next_year = today + timedelta(days=365)
         plans = [
@@ -77,7 +101,7 @@ def seed_database():
             VALUES ('Enterprise Annual Discounted Proposal', 2, 45, 'Annual package with discounted seat add-ons for enterprise clients')
         """)
 
-        # 7. Seed Discount Rules (Scene 5: fixed amount or percentage, min qty/purchase, limits, target)
+        # 7. Seed Discount Rules
         cursor.execute("""
             INSERT INTO discount_rules (name, code, rule_type, discount_value, min_purchase, min_quantity, start_date, end_date, usage_limit, times_used, target_type, target_product_id)
             VALUES ('Volume Team Discount 10%', 'TEAM10', 'percentage', 10.0, 1000.0, 3, '2026-01-01', '2026-12-31', 100, 14, 'whole_subscription', NULL)
@@ -87,9 +111,7 @@ def seed_database():
             VALUES ('Early Adopter $250 Off', 'EARLY250', 'fixed', 250.0, 1200.0, 1, '2026-01-01', '2026-12-31', 50, 22, 'whole_subscription', NULL)
         """)
 
-        # 8. Seed Subscriptions across all lifecycle stages
-        # Stages: Draft -> Quotation -> Confirmed -> Active -> Closed
-        # Sub 1: Anna Jones (Active, Odoo Variant)
+        # 8. Seed Subscriptions
         cursor.execute("""
             INSERT INTO subscriptions (subscription_number, quotation_id, customer_id, plan_id, status, start_date, expiry_date, payment_terms, subtotal, discount_amount, tax_amount, total_amount, billing_cycle, is_paused)
             VALUES ('SUB-2026-001', NULL, 3, 1, 'Active', '2026-10-01', '2027-10-01', 'Net 30', 1760.0, 100.0, 298.8, 1958.8, 'monthly', 0)
@@ -100,7 +122,6 @@ def seed_database():
             VALUES (?, 1, 2, 1, 1760.0, 18.0, 1760.0)
         """, (sub_id,))
 
-        # Sub 2: Carlos Brown III (Confirmed)
         cursor.execute("""
             INSERT INTO subscriptions (subscription_number, quotation_id, customer_id, plan_id, status, start_date, expiry_date, payment_terms, subtotal, discount_amount, tax_amount, total_amount, billing_cycle, is_paused)
             VALUES ('SUB-2026-002', NULL, 4, 2, 'Confirmed', '2026-10-15', '2027-10-15', 'Net 15', 12500.0, 1250.0, 2025.0, 13275.0, 'yearly', 0)
@@ -110,7 +131,6 @@ def seed_database():
             VALUES (2, 1, 1, 1, 12500.0, 18.0, 12500.0)
         """)
 
-        # Sub 3: Joel Cannan (Quotation state)
         cursor.execute("""
             INSERT INTO subscriptions (subscription_number, quotation_id, customer_id, plan_id, status, start_date, expiry_date, payment_terms, subtotal, discount_amount, tax_amount, total_amount, billing_cycle, is_paused)
             VALUES ('SUB-2026-003', NULL, 5, 1, 'Quotation', '2026-11-01', '2027-11-01', 'Immediate', 1200.0, 0.0, 216.0, 1416.0, 'monthly', 0)
@@ -120,19 +140,17 @@ def seed_database():
             VALUES (3, 1, 1, 1, 1200.0, 18.0, 1200.0)
         """)
 
-        # Sub 4: Draft state
         cursor.execute("""
             INSERT INTO subscriptions (subscription_number, quotation_id, customer_id, plan_id, status, start_date, expiry_date, payment_terms, subtotal, discount_amount, tax_amount, total_amount, billing_cycle, is_paused)
             VALUES ('SUB-2026-004', NULL, 3, 3, 'Draft', '2026-11-05', '2026-12-05', 'Net 7', 350.0, 0.0, 63.0, 413.0, 'weekly', 0)
         """)
 
-        # Sub 5: Closed state
         cursor.execute("""
             INSERT INTO subscriptions (subscription_number, quotation_id, customer_id, plan_id, status, start_date, expiry_date, payment_terms, subtotal, discount_amount, tax_amount, total_amount, billing_cycle, is_paused)
             VALUES ('SUB-2026-005', NULL, 5, 4, 'Closed', '2026-08-01', '2026-09-01', 'Immediate', 75.0, 0.0, 13.5, 88.5, 'daily', 0)
         """)
 
-        # 9. Seed Quotations (Draft -> Sent -> Accepted)
+        # 9. Seed Quotations
         cursor.execute("""
             INSERT INTO quotations (quote_number, customer_id, staff_id, plan_id, template_name, valid_days, subtotal, discount_amount, tax_amount, total_amount, notes, status)
             VALUES ('QT-2026-001', 3, 2, 1, 'Standard SaaS Subscription Offer', 30, 1760.0, 100.0, 298.8, 1958.8, 'Includes Odoo Brand variant integration and priority onboarding', 'Accepted')
@@ -146,7 +164,7 @@ def seed_database():
             VALUES ('QT-2026-003', 5, 2, 1, 'Standard SaaS Subscription Offer', 15, 1200.0, 0.0, 216.0, 1416.0, 'Awaiting customer review', 'Draft')
         """)
 
-        # 10. Seed Invoices (Draft -> Confirmed -> Paid)
+        # 10. Seed Invoices
         cursor.execute("""
             INSERT INTO invoices (invoice_number, subscription_id, customer_id, issue_date, due_date, status, subtotal, tax_amount, discount_amount, total_amount, paid_amount, notes)
             VALUES ('INV-2026-001', 1, 3, '2026-10-01', '2026-10-31', 'Paid', 1760.0, 298.8, 100.0, 1958.8, 1958.8, 'October 2026 monthly billing')

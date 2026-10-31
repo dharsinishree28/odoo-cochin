@@ -169,3 +169,65 @@ def convert_to_subscription(quote_id: int):
             "subscription_number": sub_number,
             "status": "Confirmed"
         }
+
+
+from app.schemas import CustomerQuoteRequest
+
+@router.post("/request")
+def request_customer_quotation(req: CustomerQuoteRequest):
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        # Verify customer exists
+        cursor.execute("SELECT id, full_name, email FROM users WHERE id = ?", (req.customer_id,))
+        cust = cursor.fetchone()
+        if not cust:
+            raise HTTPException(status_code=404, detail="Customer not found")
+            
+        # Check active subscription for this customer
+        cursor.execute("SELECT plan_id FROM subscriptions WHERE customer_id = ? AND status = 'Active'", (req.customer_id,))
+        active_sub = cursor.fetchone()
+        plan_id = active_sub["plan_id"] if active_sub else None
+        
+        # Prevent rapid duplicate clicks (within last 15 seconds)
+        cursor.execute("""
+            SELECT id FROM quotations 
+            WHERE customer_id = ? AND template_name = ? 
+              AND datetime(created_at) > datetime('now', '-15 seconds')
+        """, (req.customer_id, req.offer_title or "Quotation Request"))
+        if cursor.fetchone():
+            raise HTTPException(status_code=409, detail="A quotation request for this offer was just submitted. Please check My Quotations.")
+            
+        quote_num = f"QT-2026-{random.randint(1000, 9999)}"
+        template_name = req.offer_title or "Special Offer Quotation"
+        
+        cursor.execute("""
+            INSERT INTO quotations (
+                quote_number, customer_id, staff_id, plan_id, template_name,
+                valid_days, subtotal, discount_amount, tax_amount, total_amount,
+                notes, status
+            ) VALUES (?, ?, NULL, ?, ?, 30, ?, ?, ?, ?, ?, 'Draft')
+        """, (
+            quote_num, req.customer_id, plan_id, template_name,
+            req.original_price, req.discount_amount, req.tax_amount, req.total_amount,
+            req.notes or f"Customer quote request for {template_name}"
+        ))
+        quote_id = cursor.lastrowid
+        
+        # Insert line item
+        cursor.execute("""
+            INSERT INTO quotation_lines (
+                quotation_id, product_id, variant_id, quantity, unit_price, tax_rate, line_total
+            ) VALUES (?, ?, ?, 1, ?, ?, ?)
+        """, (
+            quote_id, req.product_id, req.variant_id,
+            req.unit_price, req.tax_rate, req.unit_price
+        ))
+        
+        return {
+            "message": f"Quotation requested successfully! Reference: {quote_num}",
+            "quote_id": quote_id,
+            "quote_number": quote_num,
+            "status": "Pending",
+            "total_amount": req.total_amount
+        }
